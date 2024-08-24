@@ -1,0 +1,125 @@
+{
+    "reviews": [
+      {
+        "Professor": "Dr. John Smith",
+        "subject": "Physics",
+        "stars": 4,
+        "review": "Dr. Smith explains concepts well but sometimes rushes through material."
+      },
+      {
+        "Professor": "Dr. Emily Johnson",
+        "subject": "Mathematics",
+        "stars": 5,
+        "review": "She is an excellent professor. Her lectures are clear and very organized."
+      },
+      {
+        "Professor": "Dr. Michael Brown",
+        "subject": "Chemistry",
+        "stars": 3,
+        "review": "His classes are tough, but you'll learn a lot if you keep up with the material."
+      },
+      {
+        "Professor": "Dr. Sarah Davis",
+        "subject": "Biology",
+        "stars": 2,
+        "review": "Dr. Davis is knowledgeable but often unapproachable and hard to understand."
+      },
+      {
+        "Professor": "Dr. William Martinez",
+        "subject": "Computer Science",
+        "stars": 5,
+        "review": "His passion for the subject is contagious, and he really cares about his students."
+      },
+      {
+        "Professor": "Dr. Patricia Garcia",
+        "subject": "English",
+        "stars": 4,
+        "review": "She is a great professor, though the workload can be overwhelming at times."
+      },
+      {
+        "Professor": "Dr. Robert Wilson",
+        "subject": "History",
+        "stars": 3,
+        "review": "The lectures are interesting, but the grading is quite harsh."
+      },
+      {
+        "Professor": "Dr. Linda Martinez",
+        "subject": "Economics",
+        "stars": 5,
+        "review": "Fantastic professor with deep insights into real-world economics."
+      },
+      {
+        "Professor": "Dr. Thomas Anderson",
+        "subject": "Philosophy",
+        "stars": 4,
+        "review": "His classes are thought-provoking, but he expects a lot from his students."
+      },
+      {
+        "Professor": "Dr. Karen Lee",
+        "subject": "Psychology",
+        "stars": 2,
+        "review": "The lectures are often boring, and the exams are tricky."
+      },
+      {
+        "Professor": "Dr. James Harris",
+        "subject": "Sociology",
+        "stars": 3,
+        "review": "He is knowledgeable, but his lectures can be dry and unengaging."
+      },
+      {
+        "Professor": "Dr. Barbara Clark",
+        "subject": "Political Science",
+        "stars": 5,
+        "review": "She is very passionate and makes every topic interesting."
+      },
+      {
+        "Professor": "Dr. Daniel Lewis",
+        "subject": "Statistics",
+        "stars": 4,
+        "review": "Dr. Lewis is very helpful, but the class moves quickly."
+      },
+      {
+        "Professor": "Dr. Jessica Robinson",
+        "subject": "Literature",
+        "stars": 5,
+        "review": "Her classes are insightful and she encourages deep thinking."
+      },
+      {
+        "Professor": "Dr. Steven Walker",
+        "subject": "Engineering",
+        "stars": 3,
+        "review": "The material is tough, but he offers good support if you ask for it."
+      },
+      {
+        "Professor": "Dr. Mary White",
+        "subject": "Art History",
+        "stars": 4,
+        "review": "Her enthusiasm for the subject is infectious, though the grading can be strict."
+      },
+      {
+        "Professor": "Dr. Christopher Hall",
+        "subject": "Environmental Science",
+        "stars": 5,
+        "review": "He is very engaging and connects the material to real-world issues."
+      },
+      {
+        "Professor": "Dr. Elizabeth Allen",
+        "subject": "Anthropology",
+        "stars": 4,
+        "review": "Her classes are interesting, but sometimes the readings are overwhelming."
+      },
+      {
+        "Professor": "Dr. Joseph King",
+        "subject": "Physics",
+        "stars": 2,
+        "review": "He is very knowledgeable, but his lectures are hard to follow."
+      },
+      {
+        "Professor": "Dr. Nancy Baker",
+        "subject": "Chemistry",
+        "stars": 3,
+        "review": "She is strict and expects a lot, but she is fair and knowledgeable."
+      }
+    ]
+  }
+  
