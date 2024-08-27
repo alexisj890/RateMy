@@ -1,12 +1,12 @@
 "use client";
-import { Box, Button, Stack, TextField } from "@mui/material";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 
 export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content: `Hi! I'm the Rate My Professor support assistant. How can I help you today?`,
+      content: `Hi! I'm the ProfessorPanel support assistant. I help with any Professor related inquiries. How can I help you today?`,
     },
   ]);
   const [message, setMessage] = useState("");
@@ -19,25 +19,24 @@ export default function Home() {
       newMessage,
       { role: "assistant", content: "" },
     ]);
-  
+
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ messages: [...messages, newMessage] }), // Updated body
+      body: JSON.stringify({ messages: [...messages, newMessage] }),
     });
-  
+
     if (!response.ok) {
-      // Handle the error case
       console.error("Failed to fetch");
       return;
     }
-  
+
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let result = "";
-  
+
     reader.read().then(function processText({ done, value }) {
       if (done) {
         return setMessages((messages) => {
@@ -56,8 +55,15 @@ export default function Home() {
       return reader.read().then(processText);
     });
   };
-  
 
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      sendMessage();
+    }
+  };
+
+  
   return (
     <Box
       width="100vw"
@@ -66,53 +72,184 @@ export default function Home() {
       flexDirection="column"
       justifyContent="center"
       alignItems="center"
+      color="#FFFFFF"
+      p={2}
+      sx={{
+        backgroundImage: `url('/ratemyprof.png')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        "@media (max-width: 600px)": {
+          padding: "1rem",
+        },
+      }}
     >
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{
+          color: "#fff",
+          backgroundColor: "#111",
+          padding: "20px",
+          marginTop: "30px",
+          borderRadius: "20px",
+          fontFamily: "Kanit, sans-serif",
+          fontWeight: "900",
+          textTransform: "uppercase",
+          textAlign: "center",
+          maxWidth: "1200px",
+          "@media (max-width: 600px)": {
+            fontSize: "15px",
+            padding: "20px",
+            borderRadius: "20px",
+          },
+        }}
+      >
+        Professor Panel - Your Next Professor Awaits
+      </Typography>
+
       <Stack
-        direction={"column"}
-        width="500px"
-        height="700px"
-        border="1px solid black"
+        direction="column"
+        width="100%"
+        maxWidth="1200px"
+        height="70vh"
+        border="2px solid green"
+        borderRadius={4}
         p={2}
         spacing={3}
+        sx={{
+          backgroundColor: "#111",
+          color: "white",
+          overflow: "hidden",
+          mt: 2,
+          "@media (max-width: 600px)": {
+            height: "60vh",
+          },
+        }}
       >
         <Stack
-          direction={"column"}
+          direction="column"
           spacing={2}
           flexGrow={1}
           overflow="auto"
-          maxHeight="100%"
+          sx={{
+            "&::-webkit-scrollbar": {
+              width: "6px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "grey",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "darkgrey",
+              borderRadius: "4px",
+            },
+            "@media (max-width: 600px)": {
+              "&::-webkit-scrollbar": {
+                width: "4px",
+              },
+            },
+          }}
         >
-          {messages.map((message, index) => (
+          {messages.map((msg, index) => (
             <Box
               key={index}
               display="flex"
               justifyContent={
-                message.role === "assistant" ? "flex-start" : "flex-end"
+                msg.role === "assistant" ? "flex-start" : "flex-end"
               }
             >
               <Box
-                bgcolor={
-                  message.role === "assistant"
-                    ? "primary.main"
-                    : "secondary.main"
-                }
+                bgcolor={msg.role === "assistant" ? "green" : "#2a6129"}
                 color="white"
                 borderRadius={16}
-                p={3}
+                padding={"24px"}
+                m={1}
+                boxShadow={3}
+                style={{
+                  color: "#FFF",
+                  border: "3px solid #111",
+                  maxWidth: "80%",
+                  "@media (max-width: 600px)": {
+                    padding: "15px",
+                  },
+                }}
               >
-                {message.content}
+                {msg.content}
               </Box>
             </Box>
           ))}
         </Stack>
-        <Stack direction={"row"} spacing={2}>
+        <Stack
+          direction="row"
+          spacing={2}
+          alignItems="center"
+          color="white"
+          sx={{
+            "@media (maxidth: 600px)": {
+              flexDirection: "column",
+              gap: "1rem",
+            },
+          }}
+        >
           <TextField
-            label="Message"
+            label="Enter your message here: "
             fullWidth
+            multiline
+            maxRows={5}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            InputProps={{
+              style: {
+                color: "white",
+              },
+            }}
+            InputLabelProps={{
+              style: {
+                color: "#FFF",
+                transition: "all 0.2s ease",
+              },
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "green",
+                },
+                "&:hover fieldset": {
+                  borderColor: "green",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "green",
+                },
+              },
+              "& .MuiInputBase-input": {
+                overflow: "auto",
+                "@media (max-width: 600px)": {
+                  fontSize: "15px",
+                },
+              },
+            }}
           />
-          <Button variant="contained" onClick={sendMessage}>
+          <Button
+            variant="contained"
+            onClick={sendMessage}
+            sx={{
+              height: "56px",
+              bgcolor: "green",
+              fontWeight: "bold",
+              color: "#FFF",
+              "@media (maxidth: 600px)": {
+                width: "100%",
+                height: "48px",
+                fontSize: "0.875rem",
+              },
+              "&:hover": {
+                bgcolor: "#2a6129",
+                fontWeight: "bold",
+                color: "#FFF",
+              },
+            }}
+          >
             Send
           </Button>
         </Stack>
