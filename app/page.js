@@ -12,48 +12,55 @@ export default function Home() {
   const [message, setMessage] = useState("");
 
   const sendMessage = async () => {
-    setMessage("");
+    if (!message.trim()) return; // Prevent sending empty messages
+
     const newMessage = { role: "user", content: message };
-    setMessages((messages) => [
-      ...messages,
+    setMessages((prevMessages) => [
+      ...prevMessages,
       newMessage,
       { role: "assistant", content: "" },
     ]);
 
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ messages: [...messages, newMessage] }),
-    });
+    setMessage(""); // Clear input field
 
-    if (!response.ok) {
-      console.error("Failed to fetch");
-      return;
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let result = "";
-
-    reader.read().then(function processText({ done, value }) {
-      if (done) {
-        return setMessages((messages) => {
-          let lastMessage = messages[messages.length - 1];
-          let otherMessages = messages.slice(0, messages.length - 1);
-          return [
-            ...otherMessages,
-            { ...lastMessage, content: lastMessage.content + result },
-          ];
-        });
-      }
-      const text = decoder.decode(value || new Uint8Array(), {
-        stream: true,
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify([...messages, newMessage]),
       });
-      result += text;
-      return reader.read().then(processText);
-    });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let result = "";
+
+      const processText = async ({ done, value }) => {
+        if (done) {
+          setMessages((prevMessages) => {
+            const lastMessage = prevMessages[prevMessages.length - 1];
+            const otherMessages = prevMessages.slice(0, -1);
+            return [
+              ...otherMessages,
+              { ...lastMessage, content: lastMessage.content + result },
+            ];
+          });
+          return;
+        }
+
+        result += decoder.decode(value, { stream: true });
+        reader.read().then(processText);
+      };
+
+      reader.read().then(processText);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
   };
 
   const handleKeyPress = (event) => {
@@ -63,7 +70,6 @@ export default function Home() {
     }
   };
 
-  
   return (
     <Box
       width="100vw"

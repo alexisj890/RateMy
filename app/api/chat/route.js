@@ -1,125 +1,131 @@
 import { NextResponse } from "next/server";
 import { Pinecone } from "@pinecone-database/pinecone";
 import OpenAI from "openai";
-import { Stardos_Stencil } from "next/font/google";
 
-const systemPrompt = `
-System Prompt:
+const systemPrompt = 
+`
+You are an AI assistant specialized in helping students find professors based on their specific needs and preferences. Your primary function is to provide the top 3 most relevant professors for each user query using a Retrieval-Augmented Generation (RAG) system.
 
-You are a knowledgeable assistant designed to help students find professors based on their specific queries using RateMyProfessor data. You will use Retrieval-Augmented Generation (RAG) to search through a database of professor reviews and ratings to provide the top 3 professors that best match the student's query. Your responses should be concise, informative, and tailored to the student's needs.
+Your knowledge base includes detailed information about professors, including:
+- Teaching style and methods
+- Course difficulty and workload
+- Grading policies and fairness
+- Areas of expertise and research interests
+- Student reviews and ratings
+- Availability for office hours and additional help
+- Teaching experience and qualifications
 
-Instructions:
+For each user query, follow these steps:
 
-Understand the Query:
+1. Analyze the user's request, identifying key criteria and preferences.
+2. Use the RAG system to retrieve relevant information from your knowledge base.
+3. Evaluate and rank the professors based on how well they match the user's requirements.
+4. Present the top 3 professors, providing a concise summary for each that includes:
+   - Name and department
+   - Key strengths relevant to the user's query
+   - Overall rating (e.g., 4.5/5)
+   - A brief quote from a student review
 
-Carefully interpret the student's query to understand what they are looking for in a professor (e.g., subject, teaching style, rating, etc.).
-Queries might include specific criteria such as the subject area, rating, teaching style, availability, difficulty level, or even specific attributes like "engaging lectures" or "fair grading."
+5. Offer to provide more detailed information about any of the suggested professors if the user requests it.
 
-Search the Database:
+Remember to:
+- Be objective and fair in your assessments
+- Respect privacy by not sharing personal information about professors or students
+- Encourage users to consider multiple factors when choosing a professor
+- Remind users that experiences may vary and to use the information as a guide rather than an absolute truth
 
-Use RAG to retrieve the most relevant professors based on the query. Consider factors such as subject expertise, student ratings, review content, and any other relevant data.
+If a user's query is unclear or lacks specific criteria, ask follow-up questions to better understand their needs before providing recommendations.
 
-Provide the Top 3 Recommendations:
+Your goal is to help students make informed decisions about their course selections by matching them with professors who best fit their learning style and academic goals.
+`
 
-Present the top 3 professors that best match the query. Include their names, the subjects they teach, their average rating (out of 5 stars), and a brief summary of relevant reviews or attributes.
-Ensure the recommendations are ranked in order of relevance to the student's query.
-
-Clarify and Suggest Alternatives:
-
-If the query is ambiguous or could have multiple interpretations, clarify the query with the student.
-Offer suggestions for alternative queries or additional criteria if the initial results do not fully match the student's needs.
-
-Maintain Professionalism and Neutrality:
-
-Provide unbiased recommendations based on the data.
-Avoid making personal judgments or assumptions about the professors.
-
-Example Interaction:
-
-Student: "I'm looking for an easy-going Biology professor who is fair with grading."
-
-Assistant:
-
-Top 3 Professors:
-1. Dr. Sarah Davis
-   - Subject: Biology
-   - Rating: 4.5/5
-   - Summary: Dr. Davis is known for her clear explanations and fair grading. Students appreciate her approachable nature and how she ensures that everyone understands the material.
-
-2. Dr. Michael Brown
-   - Subject: Biology
-   - Rating: 4.2/5
-   - Summary: Dr. Brown is easy-going and makes complex topics understandable. He is fair with grading but expects students to stay engaged throughout the course.
-
-3. Dr. Elizabeth Allen
-   - Subject: Biology
-   - Rating: 4.0/5
-   - Summary: Dr. Allen's lectures are well-organized and she is very fair with grading. While her courses are challenging, she provides ample support for students to succeed.
-`;
 
 export async function POST(req) {
-  const data = await req.json();
-  const pc = new Pinecone({
-    apiKey: process.env.PINECONE_API_KEY,
-  });
-  const index = pc.index("rag").namespace("ns1");
-  const openai = new OpenAI();
+  try {
+    const data = await req.json();
 
-  const text = data[data.length - 1].content;
-  const embedding = await openai.embeddings.create({
-    model: "text-embedding-ada-002", // Updated model name for embeddings
-    input: text,
-  });
+    // Validate request data
+    if (!Array.isArray(data) || data.length === 0 || !data[data.length - 1]?.content) {
+      return new NextResponse('Invalid request format', { status: 400 });
+    }
 
-  const results = await index.query({
-    topK: 3,
-    includeMetadata: true,
-    vector: embedding.data[0].embedding,
-  });
+    const lastMessage = data[data.length - 1];
+    const text = lastMessage.content;
 
-  let resultString =
-    "\n\nReturned results from vector db (done automatically): ";
-  results.matches.forEach((match) => {
-    resultString += `
+    const pc = new Pinecone({
+      apiKey: process.env.PINECONE_API_KEY,
+    });
+    const index = pc.index('rag').namespace('ns1');
+    const openai = new OpenAI();
+
+    // Get embeddings for the input text
+    const embeddingResponse = await openai.embeddings.create({
+      model: 'text-embedding-ada-002',
+      input: text,
+    });
+
+    const embedding = embeddingResponse.data[0]?.embedding;
+
+    if (!embedding) {
+      throw new Error('Failed to get embedding');
+    }
+
+    // Query the Pinecone index
+    const results = await index.query({
+      topK: 3,
+      includeMetadata: true,
+      vector: embedding,
+    });
+
+    if (!results.matches || results.matches.length === 0) {
+      throw new Error('No matches found');
+    }
+
+    // Construct result string
+    let resultString = '\n\nReturned results from vector db (done automatically): ';
+    results.matches.forEach((match) => {
+      resultString += `
         Professor: ${match.id}
-        Review: ${match.metadata.stars}
         Subject: ${match.metadata.subject}
-        Stars: ${match.metadata.stars}
+        Rating: ${match.metadata.stars}/5
+        Review: ${match.metadata.review}
         \n\n
-        `;
-  });
+      `;
+    });
 
-  const lastMessage = data[data.length - 1];
-  const lastMessageContent = lastMessage.content + resultString;
-  const lastDataWithoutLastMessage = data.slice(0, data.length - 1);
-  const completion = await openai.chat.completions.create({
-    message: [
-      { role: "system", content: systemPrompt },
-      ...lastDataWithoutLastMessage,
-      { role: "user", content: lastMessageContent },
-    ],
-    model: "gpt-4o-mini",
-    stream: true,
-  });
+    // Create a chat completion
+    const completionResponse = await openai.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...data.slice(0, data.length - 1),
+        { role: 'user', content: lastMessage.content + resultString },
+      ],
+      model: 'gpt-4o-mini',
+      stream: true,
+    });
 
-  const stream = ReadableStream({
-    async start(controller) {
-      const encoder = new TextEncoder();
-      try {
-        for await (const chunk of completion) {
-          const content = chunk.choices[0]?.delta?.content;
-          if (content) {
-            const text = encoder.encode(content);
-            controller.enqueue(text);
+    // Create a readable stream for the response
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
+        try {
+          for await (const chunk of completionResponse) {
+            const content = chunk.choices[0]?.delta?.content;
+            if (content) {
+              controller.enqueue(encoder.encode(content));
+            }
           }
+        } catch (err) {
+          controller.error(err);
+        } finally {
+          controller.close();
         }
-      } catch (err) {
-        controller.error(err);
-      } finally {
-        controller.close();
-      }
-    },
-  });
+      },
+    });
 
-  return new NextResponse(stream);
+    return new NextResponse(stream);
+  } catch (err) {
+    console.error('Error processing request:', err);
+    return new NextResponse('Internal Server Error', { status: 500 });
+  }
 }
