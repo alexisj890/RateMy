@@ -79,7 +79,7 @@ export default function Home() {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        "@media (max-width: 600px)": {
+        "@media (maxWidth: 600px)": {
           padding: "1rem",
         },
       }}
@@ -98,7 +98,7 @@ export default function Home() {
           textTransform: "uppercase",
           textAlign: "center",
           maxWidth: "1200px",
-          "@media (max-width: 600px)": {
+          "@media (maxWidth: 600px)": {
             fontSize: "15px",
             padding: "20px",
             borderRadius: "20px",
@@ -122,7 +122,7 @@ export default function Home() {
           color: "white",
           overflow: "hidden",
           mt: 2,
-          "@media (max-width: 600px)": {
+          "@media (maxWidth: 600px)": {
             height: "60vh",
           },
         }}
@@ -143,7 +143,7 @@ export default function Home() {
               background: "darkgrey",
               borderRadius: "4px",
             },
-            "@media (max-width: 600px)": {
+            "@media (maxWidth: 600px)": {
               "&::-webkit-scrollbar": {
                 width: "4px",
               },
@@ -169,7 +169,7 @@ export default function Home() {
                   color: "#FFF",
                   border: "3px solid #111",
                   maxWidth: "80%",
-                  "@media (max-width: 600px)": {
+                  "@media (maxWidth: 600px)": {
                     padding: "15px",
                   },
                 }}
@@ -185,7 +185,7 @@ export default function Home() {
           alignItems="center"
           color="white"
           sx={{
-            "@media (maxidth: 600px)": {
+            "@media (maxWidth: 600px)": {
               flexDirection: "column",
               gap: "1rem",
             },
@@ -224,7 +224,7 @@ export default function Home() {
               },
               "& .MuiInputBase-input": {
                 overflow: "auto",
-                "@media (max-width: 600px)": {
+                "@media (maxWidth: 600px)": {
                   fontSize: "15px",
                 },
               },
@@ -238,7 +238,7 @@ export default function Home() {
               bgcolor: "green",
               fontWeight: "bold",
               color: "#FFF",
-              "@media (maxidth: 600px)": {
+              "@media (maxWidth: 600px)": {
                 width: "100%",
                 height: "48px",
                 fontSize: "0.875rem",
