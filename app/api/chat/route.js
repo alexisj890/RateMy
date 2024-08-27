@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { Pinecone } from "@pinecone-database/pinecone";
 import OpenAI from "openai";
 
-const systemPrompt = 
-`
+const systemPrompt = `
 You are an AI assistant specialized in helping students find professors based on their specific needs and preferences. Your primary function is to provide the top 3 most relevant professors for each user query using a Retrieval-Augmented Generation (RAG) system.
 
 Your knowledge base includes detailed information about professors, including:
@@ -34,43 +33,53 @@ Remember to:
 - Encourage users to consider multiple factors when choosing a professor
 - Remind users that experiences may vary and to use the information as a guide rather than an absolute truth
 
+If a user greets you, greet them back. 
+If a user asks something non related, inform them that this is a professor related chat bot only. 
+
 If a user's query is unclear or lacks specific criteria, ask follow-up questions to better understand their needs before providing recommendations.
 
 Your goal is to help students make informed decisions about their course selections by matching them with professors who best fit their learning style and academic goals.
-`
-
+`;
 
 export async function POST(req) {
   try {
     const data = await req.json();
 
-    // Validate request data
-    if (!Array.isArray(data) || data.length === 0 || !data[data.length - 1]?.content) {
-      return new NextResponse('Invalid request format', { status: 400 });
+    if (
+      !Array.isArray(data) ||
+      data.length === 0 ||
+      !data[data.length - 1]?.content
+    ) {
+      return new NextResponse("Invalid request format", { status: 400 });
     }
 
     const lastMessage = data[data.length - 1];
-    const text = lastMessage.content;
+    const text = lastMessage.content.toLowerCase();
+
+    const greetings = ["hello", "hi", "hey"];
+    if (greetings.includes(text)) {
+      return NextResponse.json({
+        role: "assistant",
+        content: "Hello! How can I assist you with professor ratings today?",
+      });
+    }
 
     const pc = new Pinecone({
       apiKey: process.env.PINECONE_API_KEY,
     });
-    const index = pc.index('rag').namespace('ns1');
+    const index = pc.index("rag").namespace("ns1");
     const openai = new OpenAI();
 
-    // Get embeddings for the input text
     const embeddingResponse = await openai.embeddings.create({
-      model: 'text-embedding-ada-002',
+      model: "text-embedding-ada-002",
       input: text,
     });
 
     const embedding = embeddingResponse.data[0]?.embedding;
-
     if (!embedding) {
-      throw new Error('Failed to get embedding');
+      throw new Error("Failed to get embedding");
     }
 
-    // Query the Pinecone index
     const results = await index.query({
       topK: 3,
       includeMetadata: true,
@@ -78,54 +87,29 @@ export async function POST(req) {
     });
 
     if (!results.matches || results.matches.length === 0) {
-      throw new Error('No matches found');
+      throw new Error("No matches found");
     }
 
-    // Construct result string
-    let resultString = '\n\nReturned results from vector db (done automatically): ';
+    let resultString = "Returned results from vector db:\n";
     results.matches.forEach((match) => {
-      resultString += `
-        Professor: ${match.id}
-        Subject: ${match.metadata.subject}
-        Rating: ${match.metadata.stars}/5
-        Review: ${match.metadata.review}
-        \n\n
-      `;
+      resultString += `Professor: ${match.id}\nSubject: ${match.metadata.subject}\nRating: ${match.metadata.stars}/5\nReview: ${match.metadata.review}\n\n`;
     });
 
-    // Create a chat completion
     const completionResponse = await openai.chat.completions.create({
       messages: [
-        { role: 'system', content: systemPrompt },
+        { role: "system", content: systemPrompt },
         ...data.slice(0, data.length - 1),
-        { role: 'user', content: lastMessage.content + resultString },
+        { role: "user", content: lastMessage.content + resultString },
       ],
-      model: 'gpt-4o-mini',
-      stream: true,
+      model: "gpt-4o-mini",
     });
 
-    // Create a readable stream for the response
-    const stream = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder();
-        try {
-          for await (const chunk of completionResponse) {
-            const content = chunk.choices[0]?.delta?.content;
-            if (content) {
-              controller.enqueue(encoder.encode(content));
-            }
-          }
-        } catch (err) {
-          controller.error(err);
-        } finally {
-          controller.close();
-        }
-      },
+    // Ensure this response is in JSON format
+    return NextResponse.json({
+      content: completionResponse.choices[0]?.message?.content || "No response",
     });
-
-    return new NextResponse(stream);
   } catch (err) {
-    console.error('Error processing request:', err);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    console.error("Error processing request:", err);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

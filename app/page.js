@@ -36,28 +36,16 @@ export default function Home() {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let result = "";
+      const data = await response.json(); // Parse JSON response
 
-      const processText = async ({ done, value }) => {
-        if (done) {
-          setMessages((prevMessages) => {
-            const lastMessage = prevMessages[prevMessages.length - 1];
-            const otherMessages = prevMessages.slice(0, -1);
-            return [
-              ...otherMessages,
-              { ...lastMessage, content: lastMessage.content + result },
-            ];
-          });
-          return;
-        }
-
-        result += decoder.decode(value, { stream: true });
-        reader.read().then(processText);
-      };
-
-      reader.read().then(processText);
+      setMessages((prevMessages) => {
+        const lastMessage = prevMessages[prevMessages.length - 1];
+        const otherMessages = prevMessages.slice(0, -1);
+        return [
+          ...otherMessages,
+          { ...lastMessage, content: data.content }, // Update last message with the response content
+        ];
+      });
     } catch (error) {
       console.error("Fetch error:", error);
     }
