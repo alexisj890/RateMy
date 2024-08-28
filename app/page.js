@@ -8,8 +8,8 @@ import {
   IconButton,
 } from "@mui/material";
 import { useState } from "react";
-import GitHubIcon from '@mui/icons-material/GitHub';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import GitHubIcon from "@mui/icons-material/GitHub";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -67,10 +67,6 @@ export default function Home() {
     }
   };
 
-  const handleSignOut = () => {
-    // Sign out logic here
-  };
-
   return (
     <>
       <Box
@@ -111,7 +107,7 @@ export default function Home() {
               borderRadius: "4px", // Optional: Adds rounded corners
             }}
           >
-            CS Chronicles
+            Professor Panel
           </Typography>
         </button>
 
@@ -136,6 +132,8 @@ export default function Home() {
         </Box>
       </Box>
 
+
+      {/*Main Content is here*/}
       <Box
         width="100vw"
         height="100vh"
@@ -150,7 +148,9 @@ export default function Home() {
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          paddingTop: "80px", // Add padding to prevent content overlap with the navbar
+          "@media (maxWidth: 600px)": {
+            padding: "1rem",
+          },
         }}
       >
         <Typography
@@ -160,14 +160,14 @@ export default function Home() {
             color: "#fff",
             backgroundColor: "#111",
             padding: "20px",
-            marginTop: "30px",
+            marginTop: "100px",
             borderRadius: "20px",
             fontFamily: "Kanit, sans-serif",
             fontWeight: "900",
             textTransform: "uppercase",
             textAlign: "center",
             maxWidth: "1200px",
-            "@media (max-width: 600px)": {
+            "@media (maxWidth: 600px)": {
               fontSize: "15px",
               padding: "20px",
               borderRadius: "20px",
@@ -191,7 +191,7 @@ export default function Home() {
             color: "white",
             overflow: "hidden",
             mt: 2,
-            "@media (max-width: 600px)": {
+            "@media (maxWidth: 600px)": {
               height: "60vh",
             },
           }}
@@ -212,7 +212,7 @@ export default function Home() {
                 background: "darkgrey",
                 borderRadius: "4px",
               },
-              "@media (max-width: 600px)": {
+              "@media (maxWidth: 600px)": {
                 "&::-webkit-scrollbar": {
                   width: "4px",
                 },
@@ -231,15 +231,15 @@ export default function Home() {
                   bgcolor={msg.role === "assistant" ? "green" : "#2a6129"}
                   color="white"
                   borderRadius={16}
-                  padding={"16px"} // Adjust padding for better spacing
+                  padding={"24px"}
                   m={1}
                   boxShadow={3}
-                  sx={{
+                  style={{
                     color: "#FFF",
                     border: "3px solid #111",
                     maxWidth: "80%",
-                    "@media (max-width: 600px)": {
-                      padding: "12px",
+                    "@media (maxWidth: 600px)": {
+                      padding: "15px",
                     },
                   }}
                 >
@@ -254,7 +254,7 @@ export default function Home() {
             alignItems="center"
             color="white"
             sx={{
-              "@media (max-width: 600px)": {
+              "@media (maxWidth: 600px)": {
                 flexDirection: "column",
                 gap: "1rem",
               },
@@ -293,7 +293,7 @@ export default function Home() {
                 },
                 "& .MuiInputBase-input": {
                   overflow: "auto",
-                  "@media (max-width: 600px)": {
+                  "@media (maxWidth: 600px)": {
                     fontSize: "15px",
                   },
                 },
@@ -307,7 +307,7 @@ export default function Home() {
                 bgcolor: "green",
                 fontWeight: "bold",
                 color: "#FFF",
-                "@media (max-width: 600px)": {
+                "@media (maxWidth: 600px)": {
                   width: "100%",
                   height: "48px",
                   fontSize: "0.875rem",
