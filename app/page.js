@@ -77,7 +77,7 @@ export default function Home() {
         sx={{
           width: "100%",
           backgroundColor: "#111",
-          borderBottom: "2px solid #E5383B",
+          borderBottom: "2px solid green",
           color: "#FFFFFF",
           position: "fixed",
           top: 0,
@@ -87,7 +87,7 @@ export default function Home() {
       >
         <button
           onClick={() =>
-            window.open("https://github.com/alexisj890/chronicleAI", "_blank")
+            window.open("https://github.com/alexisj890/RateMy", "_blank")
           }
           style={{
             all: "unset",
