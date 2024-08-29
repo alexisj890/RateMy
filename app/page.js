@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import OpenInBrowserIcon from '@mui/icons-material/OpenInBrowser';
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -128,6 +129,15 @@ export default function Home() {
             target="_blank"
           >
             <LinkedInIcon />
+          </IconButton>
+
+            <IconButton
+            color="inherit"
+            component="a"
+            href="https://smart-study-five.vercel.app/"
+            target="_blank"
+          >
+            <OpenInBrowserIcon />
           </IconButton>
         </Box>
       </Box>
